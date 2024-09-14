@@ -231,7 +231,7 @@ func mainErr() error {
 		desk.SetSystemTrayMenu(m)
 	}
 
-	mainLabel := widget.NewLabel("Root path: " + *configFilePath)
+	mainLabel := widget.NewLabel("Shared folder path: " + config.Path)
 	w.SetContent(container.NewVBox(
 		mainLabel,
 		widget.NewButton("Hide to system tray", func() {
@@ -248,7 +248,7 @@ func mainErr() error {
 	})
 
 	dmsServer := &dms.Server{
-		Logger: logger.WithNames("dms", "server"),
+		Logger: logger.WithNames("lms", "server"),
 		Interfaces: func(ifName string) (ifs []net.Interface) {
 			var err error
 			if ifName == "" {
