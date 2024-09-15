@@ -16,6 +16,10 @@ test: ## run tests in project
 release-mac: ## build .dmg app
 	fyne package -os darwin -name LMS  -icon ./data/app-icon.png
 
+.PHONY: release-lin
+release-lin: ## build linux app
+	fyne package -os linux -name LMS  -icon ./data/app-icon.png
+
 .PHONY: download
 download: ## dowmload deps
 	$(GOENV) go mod download
