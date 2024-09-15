@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 )
 
 func init() {

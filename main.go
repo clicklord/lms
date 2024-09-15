@@ -22,7 +22,6 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/anacrolix/log"
 	"github.com/nfnt/resize"
 
 	"fyne.io/fyne/v2"
@@ -32,6 +31,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 
 	"github.com/clicklord/lms/dlna/dms"
+	"github.com/clicklord/lms/log"
 	"github.com/clicklord/lms/rrcache"
 )
 
@@ -170,7 +170,8 @@ func mainErr() error {
 		return fmt.Errorf("%s: %s\n", "unexpected positional arguments", flag.Args())
 	}
 
-	logger := log.Default.WithNames("main")
+	logger := log.New()
+	logger.SetAsDefault()
 
 	config.Path, _ = filepath.Abs(*path)
 	config.IfName = *ifName
@@ -189,7 +190,7 @@ func mainErr() error {
 	if config.TranscodeLogPattern == "" {
 		u, err := user.Current()
 		if err != nil {
-			return fmt.Errorf("unable to resolve current user: %q", err)
+			return fmt.Errorf("unable to resolve current user: %v", err)
 		}
 		config.TranscodeLogPattern = filepath.Join(u.HomeDir, ".lms", "log", "[tsname]")
 	}
@@ -199,9 +200,9 @@ func mainErr() error {
 	}
 	config.load(*configFilePath)
 
-	logger.Printf("device icon sizes are %q", config.DeviceIconSizes)
-	logger.Printf("allowed ip nets are %q", config.AllowedIpNets)
-	logger.Printf("serving folder %q", config.Path)
+	logger.Printf("device icon sizes are %s", config.DeviceIconSizes)
+	logger.Printf("allowed ip nets are %s", config.AllowedIpNets)
+	logger.Printf("serving folder %s", config.Path)
 	if config.AllowDynamicStreams {
 		logger.Printf("Dynamic streams ARE allowed")
 	}
@@ -248,7 +249,7 @@ func mainErr() error {
 	})
 
 	dmsServer := &dms.Server{
-		Logger: logger.WithNames("lms", "server"),
+		Logger: logger,
 		Interfaces: func(ifName string) (ifs []net.Interface) {
 			var err error
 			if ifName == "" {
@@ -442,7 +443,7 @@ func makeIpNets(s string) []*net.IPNet {
 				if err == nil {
 					nets = append(nets, ipnet)
 				} else {
-					log.Printf("unable to parse expression %q", el)
+					log.Printf("unable to parse expression %s", el)
 				}
 
 			} else {
@@ -450,7 +451,7 @@ func makeIpNets(s string) []*net.IPNet {
 				if err == nil {
 					nets = append(nets, ipnet)
 				} else {
-					log.Printf("unable to parse ip %q", el)
+					log.Printf("unable to parse ip %s", el)
 				}
 			}
 		}

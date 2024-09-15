@@ -23,10 +23,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anacrolix/log"
 	"github.com/clicklord/lms/ffprobe"
 
 	"github.com/clicklord/lms/dlna"
+	"github.com/clicklord/lms/log"
 	"github.com/clicklord/lms/soap"
 	"github.com/clicklord/lms/ssdp"
 	"github.com/clicklord/lms/transcode"
@@ -184,7 +184,6 @@ func (me *Server) doSSDP() {
 
 // Run SSDP server on an interface.
 func (me *Server) ssdpInterface(if_ net.Interface) {
-	logger := me.Logger.WithNames("ssdp", if_.Name)
 	s := ssdp.Server{
 		Interface: if_,
 		Devices:   devices(),
@@ -195,7 +194,7 @@ func (me *Server) ssdpInterface(if_ net.Interface) {
 		Server:         serverField,
 		UUID:           me.rootDeviceUUID,
 		NotifyInterval: me.NotifyInterval,
-		Logger:         logger,
+		Logger:         me.Logger,
 	}
 	if err := s.Init(); err != nil {
 		if if_.Flags&ssdpInterfaceFlags != ssdpInterfaceFlags {
@@ -208,16 +207,16 @@ func (me *Server) ssdpInterface(if_ net.Interface) {
 			// good.
 			return
 		}
-		logger.Printf("error creating ssdp server on %s: %s", if_.Name, err)
+		me.Logger.Printf("error creating ssdp server on %s: %s", if_.Name, err)
 		return
 	}
 	defer s.Close()
-	logger.Levelf(log.Info, "started SSDP on %q", if_.Name)
+	me.Logger.Printf("started SSDP on %s", if_.Name)
 	stopped := make(chan struct{})
 	go func() {
 		defer close(stopped)
 		if err := s.Serve(); err != nil {
-			logger.Printf("%q: %q\n", if_.Name, err)
+			me.Logger.Printf("%s: %v\n", if_.Name, err)
 		}
 	}()
 	select {
@@ -458,7 +457,7 @@ func (me *Server) serveDLNATranscode(w http.ResponseWriter, r *http.Request, pat
 			log.Printf("couldn't create transcode log file: %s", err)
 		} else {
 			defer aLogFile.Close()
-			log.Printf("logging transcode to %q", stderrPath)
+			log.Printf("logging transcode to %s", stderrPath)
 		}
 		logFile = aLogFile
 	}
@@ -736,7 +735,7 @@ func (server *Server) contentDirectoryInitialEvent(urls []*url.URL, sid string) 
 		}
 		server.eventingLogger.Print(resp)
 		b, _ := ioutil.ReadAll(resp.Body)
-		server.eventingLogger.Println(string(b))
+		server.eventingLogger.Print(string(b))
 		resp.Body.Close()
 	}
 }
@@ -767,13 +766,13 @@ func (server *Server) contentDirectoryEventSubHandler(w http.ResponseWriter, r *
 	// test it with.
 	server.eventingLogger.Print(r.Header)
 	service := server.services["ContentDirectory"]
-	server.eventingLogger.Println(r.RemoteAddr, r.Method, r.Header.Get("SID"))
+	server.eventingLogger.Print(r.RemoteAddr, r.Method, r.Header.Get("SID"))
 	if r.Method == "SUBSCRIBE" && r.Header.Get("SID") == "" {
 		urls := upnp.ParseCallbackURLs(r.Header.Get("CALLBACK"))
-		server.eventingLogger.Println(urls)
+		server.eventingLogger.Print(urls)
 		var timeout int
 		fmt.Sscanf(r.Header.Get("TIMEOUT"), "Second-%d", &timeout)
-		server.eventingLogger.Println(timeout, r.Header.Get("TIMEOUT"))
+		server.eventingLogger.Print(timeout, r.Header.Get("TIMEOUT"))
 		sid, timeout, _ := service.Subscribe(urls, timeout)
 		w.Header()["SID"] = []string{sid}
 		w.Header()["TIMEOUT"] = []string{fmt.Sprintf("Second-%d", timeout)}
@@ -831,7 +830,7 @@ func (server *Server) initMux(mux *http.ServeMux) {
 			server.RootObjectPath,
 		})
 		if err != nil {
-			log.Println(err)
+			log.Print(err)
 		}
 	})
 	mux.HandleFunc(contentDirectoryEventSubURL, server.contentDirectoryEventSubHandler)
@@ -939,8 +938,8 @@ func (s *Server) initServices() (err error) {
 }
 
 func (srv *Server) Init() (err error) {
-	srv.eventingLogger = srv.Logger.WithNames("eventing")
-	srv.eventingLogger.Levelf(log.Debug, "hello %v", "world")
+	srv.eventingLogger = srv.Logger
+	srv.eventingLogger.Printf("hello %v", "world")
 	if err = srv.initServices(); err != nil {
 		return
 	}
@@ -1016,7 +1015,7 @@ func (srv *Server) Init() (err error) {
 		return
 	}
 	srv.rootDescXML = append([]byte(`<?xml version="1.0"?>`), srv.rootDescXML...)
-	srv.Logger.Println("HTTP srv on", srv.HTTPConn.Addr())
+	srv.Logger.Print("HTTP srv on", srv.HTTPConn.Addr())
 	srv.initMux(srv.httpServeMux)
 	srv.ssdpStopped = make(chan struct{})
 	return nil

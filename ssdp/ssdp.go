@@ -13,7 +13,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 	"golang.org/x/net/ipv4"
 )
 
@@ -40,7 +40,7 @@ type badStringError struct {
 	str  string
 }
 
-func (e *badStringError) Error() string { return fmt.Sprintf("%s %q", e.what, e.str) }
+func (e *badStringError) Error() string { return fmt.Sprintf("%s %s", e.what, e.str) }
 
 func ReadRequest(b *bufio.Reader) (req *http.Request, err error) {
 	tp := textproto.NewReader(b)
@@ -268,7 +268,7 @@ func (me *Server) allTypes() (ret []string) {
 func (me *Server) handle(buf []byte, sender *net.UDPAddr) {
 	req, err := ReadRequest(bufio.NewReader(bytes.NewReader(buf)))
 	if err != nil {
-		me.Logger.Println(err)
+		me.Logger.Print(err)
 		return
 	}
 	if req.Method != "M-SEARCH" || req.Header.Get("man") != `"ssdp:discover"` {
@@ -279,7 +279,7 @@ func (me *Server) handle(buf []byte, sender *net.UDPAddr) {
 		mxHeader := req.Header.Get("mx")
 		i, err := strconv.ParseUint(mxHeader, 0, 0)
 		if err != nil {
-			me.Logger.Printf("Invalid mx header %q: %s", mxHeader, err)
+			me.Logger.Printf("Invalid mx header %s: %s", mxHeader, err)
 			return
 		}
 		mx = int64(i)

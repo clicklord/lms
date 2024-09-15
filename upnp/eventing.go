@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 )
 
 // TODO: Why use namespace prefixes in PropertySet et al? Because the spec
@@ -88,7 +88,7 @@ func ParseCallbackURLs(callback string) (ret []*url.URL) {
 	for _, match := range callbackURLRegexp.FindAllStringSubmatch(callback, -1) {
 		_url, err := url.Parse(match[1])
 		if err != nil {
-			log.Printf("bad callback url: %q", match[1])
+			log.Printf("bad callback url: %s", match[1])
 			continue
 		}
 		ret = append(ret, _url)

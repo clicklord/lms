@@ -40,7 +40,7 @@ func TestSafeFilePath(t *testing.T) {
 	for _, _case := range cases {
 		a := safeFilePath(_case.root, _case.given)
 		if a != _case.expected {
-			t.Errorf("expected %q from %q and %q but got %q", _case.expected, _case.root, _case.given, a)
+			t.Errorf("expected %s from %s and %s but got %s", _case.expected, _case.root, _case.given, a)
 		}
 	}
 }
@@ -52,7 +52,7 @@ func TestRequest(t *testing.T) {
 	}
 	buf := bytes.NewBuffer(nil)
 	resp.Write(buf)
-	t.Logf("%q", buf.String())
+	t.Logf("%s", buf.String())
 }
 
 func TestResponse(t *testing.T) {
@@ -62,5 +62,5 @@ func TestResponse(t *testing.T) {
 	resp.Header["SID"] = []string{"uuid:1337"}
 	var buf bytes.Buffer
 	resp.Write(&buf)
-	t.Logf("%q", buf.String())
+	t.Logf("%s", buf.String())
 }

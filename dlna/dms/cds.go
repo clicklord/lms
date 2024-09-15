@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/anacrolix/log"
 	"github.com/clicklord/lms/ffprobe"
+	"github.com/clicklord/lms/log"
 
 	"github.com/clicklord/lms/dlna"
 	"github.com/clicklord/lms/misc"
@@ -210,11 +210,10 @@ func (me *contentDirectoryService) cdsObjectToUpnpavObject(
 	}
 	if !mimeType.IsMedia() {
 		if isDmsMetadata {
-			me.Logger.Levelf(
-				log.Debug,
-				"ignored %q: enable support for dynamic streams via the -allowDynamicStreams command line flag", cdsObject.FilePath())
+			me.Logger.Printf(
+				"ignored %s: enable support for dynamic streams via the -allowDynamicStreams command line flag", cdsObject.FilePath())
 		} else {
-			me.Logger.Levelf(log.Debug, "ignored %q: non-media file (%s)", cdsObject.FilePath(), mimeType)
+			me.Logger.Printf("ignored %s: non-media file (%s)", cdsObject.FilePath(), mimeType)
 		}
 		return
 	}

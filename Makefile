@@ -10,7 +10,7 @@ run: ## run project
 
 .PHONY: test
 test: ## run tests in project
-	$(GOENV) go test ./...
+	$(GOENV) go clean -testcache && go test ./...
 
 .PHONY: release-mac
 release-mac: ## build .dmg app

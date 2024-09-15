@@ -7,11 +7,10 @@ import (
 	"flag"
 
 	"github.com/anacrolix/ffprobe"
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 )
 
 func main() {
-	log.SetFlags(log.Llongfile)
 	flag.Parse()
 	for _, path := range flag.Args() {
 		i, err := ffprobe.Probe(path)

@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/anacrolix/log"
 	"github.com/clicklord/lms/ffprobe"
+	"github.com/clicklord/lms/log"
 
 	. "github.com/clicklord/lms/misc"
 )
@@ -19,7 +19,7 @@ import (
 // Invokes an external command and returns a reader from its stdout. The
 // command is waited on asynchronously.
 func transcodePipe(args []string, stderr io.Writer) (r io.ReadCloser, err error) {
-	log.Println("transcode command:", args)
+	log.Print("transcode command:", args)
 	cmd := exec.Command(args[0], args[1:]...)
 	cmd.Stderr = stderr
 	r, err = cmd.StdoutPipe()

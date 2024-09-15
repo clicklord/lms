@@ -7,7 +7,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 	"github.com/clicklord/lms/upnp"
 )
 
@@ -35,7 +35,7 @@ func main() {
 	}
 	xml, err := xml.MarshalIndent(scpd, "", "  ")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	fmt.Print(string(xml))
 }

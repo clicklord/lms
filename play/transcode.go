@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 
 	"github.com/clicklord/lms/misc"
 )
@@ -20,18 +20,18 @@ func main() {
 	t := flag.String("t", "", "")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		log.Fatalln("wrong argument count")
+		log.Fatal("wrong argument count")
 	}
 	r, err := misc.Transcode(flag.Arg(0), *ss, *t)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatal(err)
 	}
 	go func() {
 		buf := bufio.NewWriterSize(os.Stdout, 1234)
 		n, err := io.Copy(buf, r)
-		log.Println("copied", n, "bytes")
+		log.Print("copied", n, "bytes")
 		if err != nil {
-			log.Println(err)
+			log.Print(err)
 		}
 	}()
 	time.Sleep(time.Second)

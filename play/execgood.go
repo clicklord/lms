@@ -9,7 +9,7 @@ import (
 	"os/exec"
 	"time"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 		io.Copy(w, out)
 		out.Close()
 		w.Close()
-		log.Println(cmd.Wait())
+		log.Print(cmd.Wait())
 	}()
 	time.Sleep(10 * time.Millisecond)
 	if _, err := io.Copy(os.Stdout, r); err != nil {

@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/anacrolix/log"
+	"github.com/clicklord/lms/log"
 )
 
 var serviceURNRegexp *regexp.Regexp = regexp.MustCompile(`^urn:(.*):service:(\w+):(\d+)$`)
