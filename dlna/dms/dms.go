@@ -270,12 +270,12 @@ type Server struct {
 	IgnorePaths []string
 	// White list of clients
 	AllowedIpNets []*net.IPNet
-	// Activate support for dynamic streams configured via .dms.json metadata files
+	// Activate support for dynamic streams configured via .lms.json metadata files
 	// This feature is not enabled by default, since having write access to a shared media
 	// folder allows executing arbitrary commands in the context of the DLNA server.
 	AllowDynamicStreams bool
 	// pattern where to write transcode logs to. The [tsname] placeholder is replaced with the name
-	// of the item currently being played. The default is $HOME/.dms/log/[tsname]
+	// of the item currently being played. The default is $HOME/.lms/log/[tsname]
 	TranscodeLogPattern string
 	Logger              log.Logger
 	eventingLogger      log.Logger

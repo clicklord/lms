@@ -23,7 +23,7 @@ import (
 	"github.com/clicklord/lms/upnpav"
 )
 
-const dmsMetadataSuffix = ".dms.json"
+const dmsMetadataSuffix = ".lms.json"
 
 type contentDirectoryService struct {
 	*Server
@@ -74,7 +74,7 @@ func readDynamicStream(metadataPath string) (*dmsDynamicMediaItem, error) {
 }
 
 func (me *contentDirectoryService) cdsObjectDynamicStreamToUpnpavObject(cdsObject object, fileInfo os.FileInfo, host, userAgent string) (ret interface{}, err error) {
-	// at this point we know that entryFilePath points to a .dms.json file; slurp and parse
+	// at this point we know that entryFilePath points to a .lms.json file; slurp and parse
 	dmsMediaItem, err := readDynamicStream(cdsObject.FilePath())
 	if err != nil {
 		me.Logger.Printf("%s ignored: %v", cdsObject.FilePath(), err)

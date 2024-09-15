@@ -38,7 +38,7 @@ func LoadConfig(logger log.Logger) (*config.DmsConfig, error) {
 	configFilePath := flag.String("config", "", "json configuration file")
 	allowedIps := flag.String("allowedIps", "", "allowed ip of clients, separated by comma")
 	forceTranscodeTo := flag.String("forceTranscodeTo", cfg.ForceTranscodeTo, "force transcoding to certain format, supported: 'chromecast', 'vp8', 'web'")
-	transcodeLogPattern := flag.String("transcodeLogPattern", "", "pattern where to write transcode logs to. The [tsname] placeholder is replaced with the name of the item currently being played. The default is $HOME/.dms/log/[tsname]")
+	transcodeLogPattern := flag.String("transcodeLogPattern", "", "pattern where to write transcode logs to. The [tsname] placeholder is replaced with the name of the item currently being played. The default is $HOME/.lms/log/[tsname]")
 	flag.BoolVar(&cfg.NoTranscode, "noTranscode", false, "disable transcoding")
 	flag.BoolVar(&cfg.NoProbe, "noProbe", false, "disable media probing with ffprobe")
 	flag.BoolVar(&cfg.StallEventSubscribe, "stallEventSubscribe", false, "workaround for some bad event subscribers")
@@ -46,7 +46,7 @@ func LoadConfig(logger log.Logger) (*config.DmsConfig, error) {
 	flag.BoolVar(&cfg.IgnoreHidden, "ignoreHidden", false, "ignore hidden files and directories")
 	flag.BoolVar(&cfg.IgnoreUnreadable, "ignoreUnreadable", false, "ignore unreadable files and directories")
 	ignorePaths := flag.String("ignore", "", "comma separated list of directories to ignore (i.e. thumbnails,thumbs)")
-	flag.BoolVar(&cfg.AllowDynamicStreams, "allowDynamicStreams", false, "activate support for dynamic streams described via .dms.json metadata files")
+	flag.BoolVar(&cfg.AllowDynamicStreams, "allowDynamicStreams", false, "activate support for dynamic streams described via .lms.json metadata files")
 
 	flag.Parse()
 	if flag.NArg() != 0 {
