@@ -47,7 +47,7 @@ var (
 )
 
 const (
-	userAgentProduct            = "dms"
+	userAgentProduct            = "lms"
 	rootDeviceType              = "urn:schemas-upnp-org:device:MediaServer:1"
 	resPath                     = "/res"
 	iconPath                    = "/icon"
