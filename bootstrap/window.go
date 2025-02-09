@@ -4,6 +4,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/widget"
 	"github.com/clicklord/lms/config"
@@ -24,9 +25,12 @@ func LoadMainWindow(cfg *config.DmsConfig) fyne.Window {
 		desk.SetSystemTrayMenu(m)
 	}
 
-	mainLabel := widget.NewLabel("Shared folder path: " + cfg.Path)
+	configWindow := configWindow(cfg, a)
+
 	w.SetContent(container.NewVBox(
-		mainLabel,
+		widget.NewButton("Configure", func() {
+			configWindow.Show()
+		}),
 		widget.NewButton("Hide to system tray", func() {
 			w.Hide()
 		}),
@@ -34,10 +38,88 @@ func LoadMainWindow(cfg *config.DmsConfig) fyne.Window {
 			a.Quit()
 		}),
 	))
-	w.Resize(fyne.NewSize(300, 100))
+
 	w.SetCloseIntercept(func() {
 		w.Hide()
 	})
+
+	return w
+}
+
+func configWindow(cfg *config.DmsConfig, a fyne.App) fyne.Window {
+	w := a.NewWindow("Config")
+
+	pathInput := widget.NewEntry()
+	pathInput.SetPlaceHolder("Enter or browse for a file...")
+	pathInput.SetText(cfg.Path)
+
+	friendlyNameInput := widget.NewEntry()
+	friendlyNameInput.SetPlaceHolder("Enter browse name")
+	friendlyNameInput.SetText(cfg.FriendlyName)
+
+	ifNameInput := widget.NewEntry()
+	ifNameInput.SetPlaceHolder("Enter broadcast interface name")
+	ifNameInput.SetText(cfg.IfName)
+
+	openFolderDialog := dialog.NewFolderOpen(
+		func(reader fyne.ListableURI, err error) {
+			if err != nil {
+				dialog.ShowError(err, w)
+				return
+			}
+
+			if reader != nil {
+				// Update the text input with the selected file path
+				pathInput.SetText(reader.Path())
+			}
+		},
+		w,
+	)
+
+	browseButton := widget.NewButton("...", func() {
+		openFolderDialog.Show()
+	})
+
+	saveButton := widget.NewButton("Save", func() {
+		cfg.Path = pathInput.Text
+		cfg.FriendlyName = friendlyNameInput.Text
+		cfg.IfName = ifNameInput.Text
+
+		err := cfg.Save()
+		if err != nil {
+			dialog.ShowError(err, w)
+			return
+		}
+
+		dialog.ShowInformation("Success", "Configuration saved successfully!", w)
+	})
+
+	pathContainer := container.NewGridWithColumns(
+		3, widget.NewLabel("Path:"),
+		pathInput,
+		container.NewGridWithColumns(6, browseButton),
+	)
+	browseNameContainer := container.NewGridWithColumns(
+		3, widget.NewLabel("Browse name:"),
+		friendlyNameInput,
+	)
+	ifNameContainer := container.NewGridWithColumns(
+		3,
+		widget.NewLabel("Interface name:"),
+		ifNameInput,
+	)
+
+	content := container.NewVBox(
+		pathContainer,
+		browseNameContainer,
+		ifNameContainer,
+		saveButton,
+		widget.NewButton("Back", func() {
+			w.Hide()
+		}),
+	)
+
+	w.SetContent(content)
 
 	return w
 }

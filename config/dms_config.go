@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
@@ -17,11 +18,11 @@ import (
 )
 
 type DmsConfig struct {
-	Path                string
-	IfName              string
+	Path                string `json:"path"`
+	IfName              string `json:"ifname"`
 	Http                string
-	FriendlyName        string
-	DeviceIcon          string
+	FriendlyName        string `json:"friendlyName"`
+	DeviceIcon          string `json:"deviceIcon"`
 	DeviceIconSizes     []string
 	LogHeaders          bool
 	FFprobeCachePath    string
@@ -39,6 +40,12 @@ type DmsConfig struct {
 }
 
 func (config *DmsConfig) Load(configPath string) {
+	err := CheckFileExistsOrCreate(configPath)
+	if err != nil {
+		log.Printf("config error (config file: '%s'): %v\n", configPath, err)
+		return
+	}
+
 	file, err := os.Open(configPath)
 	if err != nil {
 		log.Printf("config error (config file: '%s'): %v\n", configPath, err)
@@ -53,15 +60,55 @@ func (config *DmsConfig) Load(configPath string) {
 	}
 }
 
-func GetDefaultConfigPath() *string {
+func (config *DmsConfig) Save() error {
+	raw, err := json.Marshal(*config)
+	if err != nil {
+		return err
+	}
+	path := GetDefaultConfigPath()
+	if path == "" {
+		return fmt.Errorf("error get  default path")
+	}
+
+	err = os.WriteFile(path, raw, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to write config file: %w", err)
+	}
+
+	return nil
+}
+
+func GetDefaultConfigPath() string {
 	path := ""
 	_user, err := user.Current()
 	if err != nil {
 		log.Print(err)
-		return &path
+		return ""
 	}
 	path = filepath.Join(_user.HomeDir, ".lms/config.json")
-	return &path
+	return path
+}
+
+func CheckFileExistsOrCreate(filePath string) error {
+	dir := filepath.Dir(filePath)
+
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return fmt.Errorf("failed to create directory: %w", err)
+	}
+
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+
+		file, err := os.Create(filePath)
+		if err != nil {
+			return fmt.Errorf("failed to create file: %w", err)
+		}
+		defer file.Close()
+		fmt.Printf("File created: %s\n", filePath)
+	} else if err != nil {
+		return fmt.Errorf("error checking file: %w", err)
+	}
+
+	return nil
 }
 
 func GetDefaultFFprobeCachePath() (path string) {
@@ -101,6 +148,10 @@ func (fc *FFprobeCache) Set(key interface{}, value interface{}) {
 }
 
 func (cache *FFprobeCache) Load(path string) error {
+	err := CheckFileExistsOrCreate(path)
+	if err != nil {
+		return err
+	}
 	f, err := os.Open(path)
 	if err != nil {
 		return err

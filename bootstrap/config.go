@@ -16,10 +16,10 @@ import (
 func LoadConfig(logger log.Logger) (*config.DmsConfig, error) {
 	// default config
 	var cfg = &config.DmsConfig{
-		Path:             "",
-		IfName:           "",
+		Path:             config.GetDefaultConfigPath(),
+		IfName:           "en0",
 		Http:             ":1338",
-		FriendlyName:     "",
+		FriendlyName:     "LMS",
 		DeviceIcon:       "",
 		DeviceIconSizes:  []string{"48,128"},
 		LogHeaders:       false,
@@ -51,7 +51,7 @@ func LoadConfig(logger log.Logger) (*config.DmsConfig, error) {
 	flag.Parse()
 	if flag.NArg() != 0 {
 		flag.Usage()
-		return nil, fmt.Errorf("%s: %s\n", "unexpected positional arguments", flag.Args())
+		return nil, fmt.Errorf("%s: %s", "unexpected positional arguments", flag.Args())
 	}
 
 	cfg.Path, _ = filepath.Abs(*path)
@@ -77,7 +77,8 @@ func LoadConfig(logger log.Logger) (*config.DmsConfig, error) {
 	}
 
 	if len(*configFilePath) == 0 {
-		configFilePath = config.GetDefaultConfigPath()
+		defaultPath := config.GetDefaultConfigPath()
+		configFilePath = &defaultPath
 	}
 	cfg.Load(*configFilePath)
 
