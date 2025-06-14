@@ -1,6 +1,8 @@
 package bootstrap
 
 import (
+	"os"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -94,6 +96,16 @@ func configWindow(cfg *config.DmsConfig, a fyne.App) fyne.Window {
 		dialog.ShowInformation("Success", "Configuration saved successfully!", w)
 	})
 
+	clearCacheButton := widget.NewButton("Clear local cache", func() {
+		err := os.Remove(cfg.FFprobeCachePath)
+		if err != nil {
+			dialog.ShowError(err, w)
+			return
+		}
+
+		dialog.ShowInformation("Success", "Cache successfully cleared!", w)
+	})
+
 	pathContainer := container.NewGridWithColumns(
 		3, widget.NewLabel("Path:"),
 		pathInput,
@@ -113,6 +125,7 @@ func configWindow(cfg *config.DmsConfig, a fyne.App) fyne.Window {
 		pathContainer,
 		browseNameContainer,
 		ifNameContainer,
+		clearCacheButton,
 		saveButton,
 		widget.NewButton("Back", func() {
 			w.Hide()

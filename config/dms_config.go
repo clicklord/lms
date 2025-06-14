@@ -111,14 +111,13 @@ func CheckFileExistsOrCreate(filePath string) error {
 	return nil
 }
 
-func GetDefaultFFprobeCachePath() (path string) {
-	_user, err := user.Current()
+func GetDefaultFFprobeCachePath() string {
+	currUser, err := user.Current()
 	if err != nil {
 		log.Print(err)
-		return
+		return ""
 	}
-	path = filepath.Join(_user.HomeDir, ".lms/ffprobe-cache")
-	return
+	return filepath.Join(currUser.HomeDir, ".lms/ffprobe-cache")
 }
 
 type FFprobeCache struct {
